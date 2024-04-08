@@ -20,7 +20,7 @@ public class ConfirmEmailService {
 
     @Autowired
     public ConfirmEmailService(ConfirmationTokenRepository confirmationTokenRepository,
-                                  UserRepository userRepository) {
+                               UserRepository userRepository) {
         this.confirmationTokenRepository = confirmationTokenRepository;
         this.userRepository = userRepository;
     }
@@ -32,10 +32,6 @@ public class ConfirmEmailService {
 
         if (token == null) {
             return ResponseEntity.badRequest().body(new MessageResponse("invalid token."));
-        }
-
-        if (userRepository.findById(token.getUser().getId()).get().isEnabled()){
-            return ResponseEntity.badRequest().body(new MessageResponse("already confirm."));
         }
 
         if (isTokenExpired(token)) {

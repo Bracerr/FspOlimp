@@ -1,6 +1,7 @@
 package com.Bracerr.AuthService.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +13,6 @@ import java.util.UUID;
 @Data
 @Entity
 public class ConfirmationToken {
-
-//    @Value("${link.timeout.minutes}")
-//    private int timeoutMinutes;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,14 +32,15 @@ public class ConfirmationToken {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
-    public ConfirmationToken(User user) {
+
+    public ConfirmationToken(User user, int timeoutMinutes) {
         this.user = user;
         this.createdDate = new Date();
         this.confirmationToken = UUID.randomUUID().toString();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.add(Calendar.MINUTE, 5);
+        calendar.add(Calendar.MINUTE, timeoutMinutes);
         this.expiryDate = calendar.getTime();
     }
 

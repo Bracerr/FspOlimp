@@ -35,6 +35,9 @@ public class AuthService {
 
     @Value("${spring.mail.username}")
     private String emailFrom;
+
+    @Value("${link.timeout.minutes}")
+    private int timeOutMinutes;
     private final EmailSenderService emailSenderService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -58,6 +61,10 @@ public class AuthService {
     }
 
     public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
+
+        if(!userRepository.findByEmail(loginRequest.getEmail()).get().isEnabled()){
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: confirm your account first."));
+        }
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
@@ -123,7 +130,7 @@ public class AuthService {
         user.setRoles(roles);
         userRepository.save(user);
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(user);
+        ConfirmationToken confirmationToken = new ConfirmationToken(user, timeOutMinutes);
         confirmationTokenRepository.save(confirmationToken);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
