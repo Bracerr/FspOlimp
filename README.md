@@ -12,7 +12,7 @@
 В данном файле хранятся поля  
 spring.mail.username = ENTER_YOUR_MAIL  
 spring.mail.password = ENTER_YOUR_APP_PASSWORD  
-(пароль приложения получается на https://myaccount.google.com, учите что должна быть включена двухэтапная аунтефикация)
+(пароль приложения получается на https://myaccount.google.com, учтите что должна быть включена двухэтапная аунтефикация)
 
 Для тестового запуска можете использовать мои данные  
 spring.mail.username = no.reply158685@gmail.com  
