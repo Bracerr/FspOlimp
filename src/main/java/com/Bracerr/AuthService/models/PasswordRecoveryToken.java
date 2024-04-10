@@ -8,18 +8,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
-@Data
 @Entity
-@Table(name = "confirmation_token")
-public class ConfirmationToken {
+@Data
+public class PasswordRecoveryToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="token_id")
-    private long tokenid;
+    private Long tokenid;
 
-    @Column(name="confirmation_token")
-    private String confirmationToken;
+    @Column(name="passwordRecoveryToken")
+    private String passwordRecoveryToken;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
@@ -31,11 +30,10 @@ public class ConfirmationToken {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
-
-    public ConfirmationToken(User user, int timeoutMinutes) {
+    public PasswordRecoveryToken(User user, int timeoutMinutes) {
         this.user = user;
         this.createdDate = new Date();
-        this.confirmationToken = UUID.randomUUID().toString();
+        this.passwordRecoveryToken = UUID.randomUUID().toString();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -43,6 +41,7 @@ public class ConfirmationToken {
         this.expiryDate = calendar.getTime();
     }
 
-    public ConfirmationToken() {
+    public PasswordRecoveryToken() {
+
     }
 }

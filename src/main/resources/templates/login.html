@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            margin: 10px;
+            border: 2px solid white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 350px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: white;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ccc;
+        }
+
+        .notification {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .register-link {
+            margin-top: 10px;
+            font-size: 0.8em;
+        }
+
+        .register-link a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password-link {
+            margin-top: 10px;
+            font-size: 0.8em;
+        }
+
+        .forgot-password-link a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .forgot-password-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Вход</h2>
+    <form id="login-form">
+        <input type="email" id="email" placeholder="Email" required><br>
+        <input type="password" id="password" placeholder="Пароль" required><br>
+        <button type="submit">Войти</button>
+    </form>
+    <div class="notification" id="notification" style="display: none;"></div>
+    <div class="register-link">Нет аккаунта? <a href="http://localhost:8080/registration">Зарегистрироваться</a></div>
+    <div class="forgot-password-link">Забыли пароль? <a href="http://localhost:8080/recovery-password-home">Восстановить</a></div>
+</div>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const userData = {
+            "email": email,
+            "password": password
+        };
+
+        fetch('http://localhost:8080/api/auth/signin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json().then(data => ({ status: response.status, body: data }));
+                } else {
+                    return response.json().then(data => ({ status: response.status, body: data }));
+                }
+            })
+            .then(result => {
+                if (result.status === 200) {
+                    localStorage.setItem('jwtToken', result.body.token);
+
+                    const jwtToken = localStorage.getItem('jwtToken');
+                    fetch('http://localhost:8080/manage', {
+                        headers: {
+                            'Authorization': `Bearer ${jwtToken}`
+                        }
+                    })
+                        .then(response => {
+                            if (response.status === 200) {
+                                window.location.href = 'http://localhost:8080/manage';
+                            } else {
+                                throw new Error('Unauthorized');
+                            }
+                        })
+                        .catch(error => {
+                            displayNotification('Ошибка доступа');
+                        });
+
+                } else if (result.status === 400) {
+                    displayNotification('Подтвердите аккаунт, перейдя по ссылке в письме или повторите попытку через 5 минут.');
+                } else if (result.status === 401) {
+                    displayNotification('Неверный email или пароль');
+                } else {
+                    displayNotification('Произошла ошибка. Попробуйте еще раз.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                displayNotification('Произошла ошибка. Попробуйте еще раз.');
+            });
+    });
+
+    function displayNotification(message) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.style.display = 'block';
+    }
+
+</script>
+
+</body>
+
+</html>

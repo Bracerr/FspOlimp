@@ -2,13 +2,12 @@ package com.Bracerr.AuthService.services;
 
 import com.Bracerr.AuthService.models.ConfirmationToken;
 import com.Bracerr.AuthService.models.User;
-import com.Bracerr.AuthService.payload.response.MessageResponse;
 import com.Bracerr.AuthService.repository.ConfirmationTokenRepository;
 import com.Bracerr.AuthService.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 import java.util.Optional;
@@ -26,27 +25,25 @@ public class ConfirmEmailService {
     }
 
     @Transactional
-    public ResponseEntity<?> confirmUserAccount(String confirmationToken) {
+    public String confirmUserAccount(@RequestParam("token") String token) {
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByConfirmationToken(token);
 
-        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
-
-        if (token == null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("invalid token."));
+        if (confirmationToken == null) {
+            return "errorToken";
         }
 
-        if (isTokenExpired(token)) {
-            confirmationTokenRepository.deleteByUserId(token.getUser().getId());
-            userRepository.deleteUserRolesById(token.getUser().getId());
-            return ResponseEntity.badRequest().body(new MessageResponse("time out. retry"));
+        if (isTokenExpired(confirmationToken)) {
+            confirmationTokenRepository.deleteByUserId(confirmationToken.getUser().getId());
+            userRepository.deleteUserRolesById(confirmationToken.getUser().getId());
+            return "errorToken";
         }
 
-        Optional<User> optionalUser = userRepository.findByEmail(token.getUser().getEmail());
+        Optional<User> optionalUser = userRepository.findByEmail(confirmationToken.getUser().getEmail());
         User user = optionalUser.get();
         user.setEnabled(true);
         userRepository.save(user);
         confirmationTokenRepository.deleteByUserId(user.getId());
-        return ResponseEntity.ok().body(new MessageResponse("success confirm."));
-
+        return "successConfirm";
     }
 
     private boolean isTokenExpired(ConfirmationToken token) {

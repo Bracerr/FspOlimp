@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            margin: 10px;
+            border: 2px solid white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 350px;
+        }
+
+        button {
+            background-color: white;
+            color: black;
+            padding: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #ccc;
+        }
+
+        .notification {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1;
+            display: none;
+        }
+
+        .error {
+            background-color: red;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="notification" id="notification"></div>
+
+<div class="container">
+    <h2>Manage</h2>
+    <button id="getUserData">Получить данные пользователя</button>
+    <button id="getModeratorData">Получить данные модератора</button>
+    <button id="getAdminData">Получить данные админа</button>
+    <button id="logout">Выйти</button>
+    <button id="secretButton">Секретная кнопка(НЕ НАЖИМАТЬ)</button>
+</div>
+
+<script>
+    const jwtToken = localStorage.getItem('jwtToken');
+
+    if (jwtToken) {
+        fetch('http://localhost:8080/api/jwtCheck', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+            .then(response => {
+                if (response.status === 200) {
+                } else if (response.status === 401) {
+                    window.location.href = 'http://localhost:8080/login';
+                    localStorage.removeItem('jwtToken');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } else {
+        window.location.href = 'http://localhost:8080/login';
+    }
+
+    function showNotification(message, isError = false) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.classList.toggle('error', isError);
+        notification.style.display = 'block';
+
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    function fetchData(url) {
+        const jwtToken = localStorage.getItem('jwtToken');
+
+        fetch(`http://localhost:8080/api/${url}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('У вас недостаточно прав');
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                }
+                return response.text();
+            })
+            .then(data => {
+                showNotification(data);
+            })
+            .catch(_error => {
+                showNotification("У вас недостаточно прав.", true)
+            });
+    }
+
+    document.getElementById('getUserData').addEventListener('click', function() {
+        fetchData('test/user');
+    });
+
+    document.getElementById('getModeratorData').addEventListener('click', function() {
+        fetchData('test/mod');
+    });
+
+    document.getElementById('getAdminData').addEventListener('click', function() {
+        fetchData('test/admin');
+    });
+
+    document.getElementById('logout').addEventListener('click', function() {
+        localStorage.removeItem('jwtToken');
+        window.location.href = 'http://localhost:8080/login';
+    });
+
+    document.getElementById('secretButton').addEventListener('click', function() {
+        window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+    });
+
+</script>
+
+</body>
+
+</html>

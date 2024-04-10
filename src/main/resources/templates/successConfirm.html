@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmation Success</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        h2, p {
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Подтверждение успешно</h2>
+<p>Ваша учетная запись подтверждена.</p>
+<p>Теперь вы можете войти в систему.</p>
+<p id="redirectInfo">Вы будете перенаправлены на страницу через 3 секунды.</p>
+
+<script>
+    setTimeout(function() {
+        window.location.href = "http://localhost:8080/login";
+    }, 3000);
+</script>
+
+</body>
+</html>

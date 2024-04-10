@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            margin: 10px;
+            border: 2px solid white;
+            border-radius: 15px;
+            padding: 20px;
+            width: 350px;
+        }
+
+        button {
+            background-color: white;
+            color: black;
+            padding: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #ccc;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Выберите действие.</h2>
+    <button id="loginButton" onclick="window.location.href='http://localhost:8080/login'">Авторизация</button>
+    <button id="registerButton" onclick="window.location.href='http://localhost:8080/registration'">Регистрация</button>
+</div>
+
+</body>
+</html>
